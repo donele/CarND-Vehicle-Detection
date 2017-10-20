@@ -20,18 +20,18 @@ The goals / steps of this project are the following:
 
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
-###Writeup / README
+### Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
 This document is the writeup.
 
-###Histogram of Oriented Gradients (HOG)
+### Histogram of Oriented Gradients (HOG)
 
-####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
+#### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
 The images are converted to HLS color space from RGB, and the Histogram of Oriented Gradient is calculated. The choice of the color space was made by comparing the 384 instances of the lienar SVM (Support Vector Machine) classifiers trained with different parameters. Here is the list of parameters chosen for training.
 
@@ -48,7 +48,7 @@ The features are extracted by calling the function `skimage.feature.hog()` (proj
 ![alt text][imageNotCarHog]
 
 
-####2. Explain how you settled on your final choice of HOG parameters.
+#### 2. Explain how you settled on your final choice of HOG parameters.
 
 I have trained linear SVM classifiers for each combination of the following parameter values (project.ipynb cell #3).
 
@@ -94,13 +94,13 @@ For the color space HLS, the average scores for other variables were as followin
 I have chosen orientation=12, pixels per cell=8, and HOG channel='ALL'. Although they are not the best values at the tests, they look a good compromise between the performance and the memory efficiency.
 
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+#### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
 In additinon to the HOG, I also use the color histogram (`color_hist()`, project.ipynb cell #2) and the bin spatial features (`bin_spatial()`,  project.ipynb cell #2) for the training. The number of bins for the histograms are set to 32.
 
-###Sliding Window Search
+### Sliding Window Search
 
-####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
 The window search is performed by `find_bboxes()` (project.ipynb cell #8). The function calculates the hog features in small windows, which will be reused for sliding window searches.
 
@@ -110,7 +110,7 @@ Since the cars further away look smaller, the size of the windows are changed de
 
 ![alt text][imageBoxes]
 
-####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
+#### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
 Below are examples of the window search on the six test images. There are some false positives, which may be removed by  putting a threshold on a heat map (see the next section). The multiple boxes around the real cars can also be cleared up with the heat map. Furthermore, if the mothod is applied to the video images, multiple images can be used to reduce a lot of noise.
 
@@ -120,12 +120,12 @@ Below are examples of the window search on the six test images. There are some f
 
 ### Video Implementation
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
 
 Here's a [link to my video result](./output_images/project_svm.mp4)
 
 
-####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
 For each frame in the video, a heat map is constructed from the bounding boxes that are identified as a car (`find_cars_heatmap()`, project.ipynb cell #10). The heat map is initialized as a zero matrix of the size of the camera image. Each bounding box increments the values of all the pixels in the box (`add_heat()`, project.ipynb cell #10). Only the pixels with a value above a threshold are selected to form the final boxes, using the function `scipy.ndimage.measurements.label()`.
 
@@ -141,9 +141,9 @@ where $$S_t$$ is a moving average at time $$t$$, $$\textit{w}$$ is the smoothing
 
 ---
 
-###Discussion
+### Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 I have found that the success of the tracking greatly depend on the choice of the location and the size of the moving windows. This would not be a problem if the road is always flat, but when it is hilly, the search may fail. Another shortcoming of the method is the calculation speed. There are many windows in the search, and the windows overlap each other, so the calculation time increases quickly. Using other algorithms that do not depend on the moving window search may make the tracking more robust, and faster. One such methos is YOLO (You only look once), a object detection algorithm based on the convolutional neural networks. Another is SSD (Single Shot MultiBox Detector).
 
